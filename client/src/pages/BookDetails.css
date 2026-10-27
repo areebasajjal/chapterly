@@ -141,6 +141,25 @@
 }
 
 
+
+
+/* Make the author's name stand out on the details page */
+.detail-info .detail-book-author {
+  color: #294A3D;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.5;
+
+  /* Match the subtle accent from the Discover page */
+  border-left: 3px solid #8EAD93;
+  padding-left: 10px;
+
+  margin: 12px 0;
+}
+
+
+
 /* Smaller Screens */
 
 @media (max-width: 650px) {

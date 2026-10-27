@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import './BookDetails.css'
 
-// Structure of a book received from MongoDB
+
+ 
 type Book = {
   _id: string
   title: string
@@ -12,13 +13,19 @@ type Book = {
   language?: string
   coverUrl?: string
 
-  // A book can belong to multiple genres
-  // Each genre has its own MongoDB ID and name
+  // Authors connected to this book
+  authorIds?: {
+    _id: string
+    name: string
+  }[]
+
+  // Genres connected to this book
   genreIds?: {
     _id: string
     name: string
   }[]
 }
+
 
 function BookDetails() {
   // Get the book ID from the URL
@@ -100,21 +107,39 @@ function BookDetails() {
           )}
         </div>
 
-        {/* Book information section */}
+       {/* {/* Book information section  */}
         <div className="detail-info">
 
           {/* Display the book's language */}
           <span className="detail-genre">
             {book.language?.toUpperCase() || 'Unknown'}
-          </span>
+          </span> 
 
           {/* Book title */}
+          {/* <h2>{book.title}</h2>
+
+          {/* Publication year */}
+          {/* <p className="detail-author">
+            Published: {book.publicationYear || 'Unknown'}
+          </p>   */}
+
+
+                  
+          {/* Book title */}
           <h2>{book.title}</h2>
+
+          {/* Show the actual authors linked to this book */}
+          <p className="detail-book-author">
+            {book.authorIds?.map((author) => author.name).join(', ')
+              || 'Author unavailable'}
+          </p>
 
           {/* Publication year */}
           <p className="detail-author">
             Published: {book.publicationYear || 'Unknown'}
           </p>
+
+
 
           {/* Display the genres linked to this book */}
           

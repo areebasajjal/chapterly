@@ -17,6 +17,14 @@ type Book = {
     _id: string
     name: string
   }[]
+
+
+  // Authors are retrieved from MongoDB through populate()
+  authorIds?: {
+    _id: string
+    name: string
+  }[]
+
 }
 
 // Background colors used when a book has no cover image
@@ -136,8 +144,25 @@ function Discover() {
                   )}
                 </Link>
 
+                {/* Book title
+                <h3>{book.title}</h3>
+
+                {/* Publication year */}
+                {/* <p>
+                  {book.publicationYear
+                    ? `Published in ${book.publicationYear}`
+                    : 'Publication year unavailable'}
+                </p>  */}
+
+
                 {/* Book title */}
                 <h3>{book.title}</h3>
+
+                {/* Display the names of authors linked to this book */}
+                <p className="book-author">
+                  {book.authorIds?.map((author) => author.name).join(', ')
+                    || 'Author unavailable'}
+                </p>
 
                 {/* Publication year */}
                 <p>
@@ -145,6 +170,7 @@ function Discover() {
                     ? `Published in ${book.publicationYear}`
                     : 'Publication year unavailable'}
                 </p>
+
 
                 {/* Display the genres linked to this book */}
                 <div className="book-genres">

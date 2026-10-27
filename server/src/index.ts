@@ -5,6 +5,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import { Book } from './models/Books'
 import { Genre } from './models/Genres'
+import './models/Authors'
 
 const app = express()
 
@@ -32,9 +33,13 @@ app.get('/health', (req, res) => {
 app.get('/api/books', async (req, res) => {
   try {
    
-      const books = await Book.find()
-        .populate('genreIds', 'name')
-        .sort({ title: 1 })
+   
+    // Get all books, including their author and genre names
+    const books = await Book.find()
+      .populate('authorIds', 'name')
+      .populate('genreIds', 'name')
+      .sort({ title: 1 })
+
 
 
     res.json({
@@ -69,10 +74,13 @@ app.get('/api/books/:id', async (req, res) => {
         }
       })
     }
+    
 
-        // Find the selected book and get its genre names
-    const book = await Book.findById(id)
-      .populate('genreIds', 'name')
+      // Find one book and get its related authors and genres
+      const book = await Book.findById(id)
+          .populate('authorIds', 'name')
+        .populate('genreIds', 'name')
+
 
     if (!book) {
       return res.status(404).json({

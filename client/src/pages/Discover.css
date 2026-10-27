@@ -194,3 +194,20 @@
 
 
 
+/* Make the author's name stand out beneath the book title */
+.book-card .book-author {
+  color: #294A3D;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
+
+  /* A subtle green accent beside the author's name */
+  border-left: 3px solid #8EAD93;
+  padding-left: 10px;
+
+  margin: 10px 0 8px;
+}
+
+
+
