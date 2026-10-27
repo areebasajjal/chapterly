@@ -61,6 +61,8 @@
   justify-content: space-between;
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+   position: relative;
+   overflow: hidden;
 }
 
 .cover-symbol {
@@ -123,3 +125,21 @@
     width: 100%;
   }
 }
+
+
+/* Real book cover images */
+
+.book-cover-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.book-cover:hover .book-cover-image {
+  transform: scale(1.04);
+  transition: transform 0.25s ease;
+}
+

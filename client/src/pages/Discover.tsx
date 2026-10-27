@@ -8,6 +8,7 @@ type Book = {
   title: string
   publicationYear?: number
   language?: string
+  coverUrl?: string
 }
 
 const coverColors = [
@@ -25,12 +26,14 @@ function Discover() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Get the books stored in MongoDB through our Express API
   useEffect(() => {
     fetch('http://localhost:5050/api/books')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch books')
         }
+
         return response.json()
       })
       .then((result) => {
@@ -44,6 +47,7 @@ function Discover() {
       })
   }, [])
 
+  // Filter books based on what the user types
   const filteredBooks = books.filter((book) =>
     book.title.toLowerCase().includes(search.toLowerCase())
   )
@@ -78,23 +82,35 @@ function Discover() {
           <div className="book-grid">
             {filteredBooks.map((book, index) => (
               <div className="book-card" key={book._id}>
+
                 <Link
                   to={`/books/${book._id}`}
                   className="book-cover"
+                  aria-label={`View details for ${book.title}`}
                   style={{
                     backgroundColor:
                       coverColors[index % coverColors.length]
                   }}
                 >
+                  {/* Placeholder design if no cover is available */}
                   <span className="cover-symbol">✦</span>
-
-                  <span className="cover-title">
-                    {book.title}
-                  </span>
-
+                  <span className="cover-title">{book.title}</span>
                   <span className="cover-author">
                     {book.publicationYear || 'Chapterly'}
                   </span>
+
+                  {/* Display the real cover stored in MongoDB */}
+                  {book.coverUrl && (
+                    <img
+                      src={book.coverUrl}
+                      alt={`Cover of ${book.title}`}
+                      className="book-cover-image"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  )}
                 </Link>
 
                 <h3>{book.title}</h3>

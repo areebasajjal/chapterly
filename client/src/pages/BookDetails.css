@@ -1,4 +1,6 @@
 
+/* Book Details Page */
+
 .book-details {
   font-family: 'Nunito', sans-serif;
 }
@@ -11,84 +13,124 @@
   font-weight: 700;
 }
 
+/* Book Cover and Information */
+
 .book-details-layout {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
   gap: 36px;
+  max-width: 950px;
 }
 
+/* Book Cover */
+
 .detail-cover {
-  width: 210px;
-  aspect-ratio: 3 / 4;
-  flex-shrink: 0;
+  position: relative;
+  width: 220px;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
   border-radius: 12px;
-  padding: 22px;
+  background: #56736B;
   color: white;
+  padding: 20px;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.detail-cover span {
-  font-size: 27px;
+.detail-cover > span {
+  font-size: 25px;
 }
 
 .detail-cover h3 {
-  margin: 0 0 10px;
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 24px;
-  line-height: 1.2;
   color: white;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 23px;
+  line-height: 1.3;
+  margin: 0;
 }
 
-.detail-cover p {
-  color: white;
-  font-size: 12px;
+/* Real Book Image */
+
+.detail-cover-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #F5F0E8;
 }
+
+/* Book Information */
 
 .detail-info {
-  flex: 1;
+  min-width: 0;
+  padding-top: 6px;
 }
 
 .detail-genre {
   display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
   background: #EDF2E9;
   color: #52745D;
-  padding: 5px 12px;
-  border-radius: 20px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .book-details .detail-info h2 {
-  font-family: 'Fraunces', Georgia, serif;
-  font-size: 30px;
-  margin: 16px 0 5px;
+  margin: 16px 0 8px;
   color: #294A3D;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 31px;
+  line-height: 1.25;
+  font-weight: 600;
 }
 
 .detail-author {
-  color: #849187;
-  font-size: 14px;
+  margin: 0;
+  color: #819084;
+  font-size: 13px;
 }
 
 .detail-info h3 {
   margin: 30px 0 10px;
-  font-size: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #EAE6DC;
   color: #294A3D;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .detail-info p {
+  color: #65756A;
+  font-size: 14px;
   line-height: 1.8;
 }
 
+/* Smaller Screens */
+
 @media (max-width: 650px) {
   .book-details-layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 24px;
   }
 
   .detail-cover {
     width: 180px;
   }
+
+  .book-details .detail-info h2 {
+    font-size: 26px;
+  }
+
+  .detail-info h3 {
+    margin-top: 22px;
+  }
 }
+
