@@ -1,0 +1,29 @@
+
+# Dependencies
+node_modules/
+
+# Production builds
+dist/
+build/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# macOS files
+.DS_Store
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+
+# TypeScript
+*.tsbuildinfo
+
+# Test coverage
+coverage/
