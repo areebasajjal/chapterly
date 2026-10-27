@@ -1,0 +1,125 @@
+
+.discover-heading h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+
+.discover-heading p {
+  color: #849187;
+  font-size: 13px;
+}
+
+.discover-filters {
+  display: flex;
+  gap: 12px;
+  margin: 24px 0 18px;
+}
+
+.discover-filters input,
+.discover-filters select {
+  padding: 12px 14px;
+  border: 1px solid #E4E8DF;
+  border-radius: 10px;
+  background: #FBF9F5;
+  color: #294A3D;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+}
+
+.discover-filters input {
+  flex: 1;
+  min-width: 0;
+}
+
+.discover-filters select {
+  width: 150px;
+}
+
+.book-count {
+  font-size: 12px;
+  color: #849187;
+  margin-bottom: 14px !important;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 24px 18px;
+}
+
+.book-card {
+  min-width: 0;
+}
+
+.book-cover {
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cover-symbol {
+  font-size: 24px;
+}
+
+.cover-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cover-author {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.book-card h3 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  margin: 12px 0 2px;
+}
+
+.book-card p {
+  font-size: 12px;
+  color: #849187;
+  margin: 0 0 8px;
+}
+
+.genre-tag {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #EDF2E9;
+  color: #52745D;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.empty-message {
+  padding: 30px 0;
+  text-align: center;
+  color: #849187;
+}
+
+.book-cover:hover {
+  color: white;
+  transform: translateY(-3px);
+  transition: transform 0.2s;
+}
+
+@media (max-width: 600px) {
+  .discover-filters {
+    flex-direction: column;
+  }
+
+  .discover-filters select {
+    width: 100%;
+  }
+}

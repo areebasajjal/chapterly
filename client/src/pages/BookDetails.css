@@ -1,0 +1,94 @@
+
+.book-details {
+  font-family: 'Nunito', sans-serif;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  color: #52745D;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.book-details-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 36px;
+}
+
+.detail-cover {
+  width: 210px;
+  aspect-ratio: 3 / 4;
+  flex-shrink: 0;
+  border-radius: 12px;
+  padding: 22px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.detail-cover span {
+  font-size: 27px;
+}
+
+.detail-cover h3 {
+  margin: 0 0 10px;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 24px;
+  line-height: 1.2;
+  color: white;
+}
+
+.detail-cover p {
+  color: white;
+  font-size: 12px;
+}
+
+.detail-info {
+  flex: 1;
+}
+
+.detail-genre {
+  display: inline-block;
+  background: #EDF2E9;
+  color: #52745D;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.book-details .detail-info h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 30px;
+  margin: 16px 0 5px;
+  color: #294A3D;
+}
+
+.detail-author {
+  color: #849187;
+  font-size: 14px;
+}
+
+.detail-info h3 {
+  margin: 30px 0 10px;
+  font-size: 16px;
+  color: #294A3D;
+}
+
+.detail-info p {
+  line-height: 1.8;
+}
+
+@media (max-width: 650px) {
+  .book-details-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .detail-cover {
+    width: 180px;
+  }
+}
