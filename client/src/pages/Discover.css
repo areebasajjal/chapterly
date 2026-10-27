@@ -143,3 +143,54 @@
   transition: transform 0.25s ease;
 }
 
+
+/* Keep multiple genres neatly arranged on each book card */
+.book-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
+
+/* Small green labels for each book's genres */
+.genre-badge {
+  display: inline-block;
+  padding: 5px 11px;
+
+  background-color: #677266;
+  color: #e5ebe8;
+
+  border: 1px solid #85d385;
+  border-radius: 20px;
+
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+
+/* Arrange genre badges next to each other */
+.book-details-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 18px;
+}
+
+/* Match the green genre badges on Discover */
+.book-details-genre-badge {
+  background-color: #e6ede5;
+  color: #315c46;
+  border: 1px solid #d1dfd1;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+

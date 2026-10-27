@@ -4,6 +4,7 @@ import express from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import { Book } from './models/Books'
+import { Genre } from './models/Genres'
 
 const app = express()
 
@@ -30,7 +31,11 @@ app.get('/health', (req, res) => {
 
 app.get('/api/books', async (req, res) => {
   try {
-    const books = await Book.find().sort({ title: 1 })
+   
+      const books = await Book.find()
+        .populate('genreIds', 'name')
+        .sort({ title: 1 })
+
 
     res.json({
       data: books,
@@ -65,7 +70,9 @@ app.get('/api/books/:id', async (req, res) => {
       })
     }
 
+        // Find the selected book and get its genre names
     const book = await Book.findById(id)
+      .populate('genreIds', 'name')
 
     if (!book) {
       return res.status(404).json({
@@ -89,6 +96,32 @@ app.get('/api/books/:id', async (req, res) => {
     })
   }
 })
+
+
+app.get('/api/genres', async (req, res) => {
+  try {
+    // Retrieve all genres in alphabetical order
+    const genres = await Genre.find().sort({ name: 1 })
+
+    res.json({
+      data: genres,
+      meta: {
+        total: genres.length
+      }
+    })
+
+  } catch (error) {
+    console.error('Error fetching genres:', error)
+
+    res.status(500).json({
+      error: {
+        code: 'FETCH_ERROR',
+        message: 'Could not retrieve genres'
+      }
+    })
+  }
+})
+
 
 
 // Connect to MongoDB before starting the server

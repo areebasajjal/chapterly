@@ -113,6 +113,34 @@
   line-height: 1.8;
 }
 
+
+/* Container for the genres belonging to a book */
+.book-details-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 18px;
+}
+
+/* Style each genre as a small green badge */
+.book-details-genre-badge {
+  display: inline-block;
+  padding: 7px 14px;
+
+  background-color: #738b70;
+  color: #d9e5df;
+
+  border: 1px solid #d1dfd1;
+  border-radius: 20px;
+
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+
 /* Smaller Screens */
 
 @media (max-width: 650px) {
