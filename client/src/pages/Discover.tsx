@@ -1,25 +1,55 @@
-import { useState } from 'react'
-import './Discover.css'
-import { books } from '../data/books'
-import { Link } from 'react-router'
 
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
+import './Discover.css'
+
+type Book = {
+  _id: string
+  title: string
+  publicationYear?: number
+  language?: string
+}
+
+const coverColors = [
+  '#56736B',
+  '#C6A1A0',
+  '#BFA46E',
+  '#8099A3',
+  '#A87C83',
+  '#B78960'
+]
 
 function Discover() {
-
+  const [books, setBooks] = useState<Book[]>([])
   const [search, setSearch] = useState('')
-  const [genre, setGenre] = useState('All Genres')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-  const filteredBooks = books.filter((book) => {
-    const matchesSearch = book.title.toLowerCase().includes(search.toLowerCase()) || book.author.toLowerCase().includes(search.toLowerCase())
+  useEffect(() => {
+    fetch('http://localhost:5050/api/books')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch books')
+        }
+        return response.json()
+      })
+      .then((result) => {
+        setBooks(result.data)
+      })
+      .catch(() => {
+        setError('Could not load books from MongoDB.')
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
 
-    const matchesGenre = genre === 'All Genres' || book.genre === genre
-
-    return matchesSearch && matchesGenre
-  })
+  const filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="discover">
-
       <div className="discover-heading">
         <h2>Find your next favorite book.</h2>
         <p>A little something for every kind of reader.</p>
@@ -28,62 +58,67 @@ function Discover() {
       <div className="discover-filters">
         <input
           type="search"
-          placeholder="Search books or authors..."
-          aria-label="Search books or authors"
+          placeholder="Search books..."
+          aria-label="Search books"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
-        <select
-          aria-label="Filter by genre"
-          value={genre}
-          onChange={(e) => setGenre(e.target.value)}
-        >
-          <option>All Genres</option>
-          <option>Fiction</option>
-          <option>Classics</option>
-          <option>Fantasy</option>
-          <option>Self-Help</option>
-        </select>
       </div>
 
-      <p className="book-count">
-        {filteredBooks.length} books found
-      </p>
+      {loading && <p>Loading books...</p>}
 
-      <div className="book-grid">
-        {filteredBooks.map((book) => (
-          <div className="book-card" key={book.id}>
+      {error && <p role="alert">{error}</p>}
 
-            <div>
-              
-              <Link
-                to={`/books/${book.id}`}
-                className="book-cover"
-                style={{ backgroundColor: book.color }}
-                aria-label={`View details for ${book.title}`}
-              >
-                <span className="cover-symbol">✦</span>
-                <span className="cover-title">{book.title}</span>
-                <span className="cover-author">{book.author}</span>
-              </Link>
+      {!loading && !error && (
+        <>
+          <p className="book-count">
+            {filteredBooks.length} books found
+          </p>
 
-            </div>
+          <div className="book-grid">
+            {filteredBooks.map((book, index) => (
+              <div className="book-card" key={book._id}>
+                <Link
+                  to={`/books/${book._id}`}
+                  className="book-cover"
+                  style={{
+                    backgroundColor:
+                      coverColors[index % coverColors.length]
+                  }}
+                >
+                  <span className="cover-symbol">✦</span>
 
-            <h3>{book.title}</h3>
-            <p>{book.author}</p>
-            <span className="genre-tag">{book.genre}</span>
+                  <span className="cover-title">
+                    {book.title}
+                  </span>
 
+                  <span className="cover-author">
+                    {book.publicationYear || 'Chapterly'}
+                  </span>
+                </Link>
+
+                <h3>{book.title}</h3>
+
+                <p>
+                  {book.publicationYear
+                    ? `Published in ${book.publicationYear}`
+                    : 'Publication year unavailable'}
+                </p>
+
+                <span className="genre-tag">
+                  {book.language?.toUpperCase() || 'Unknown'}
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {filteredBooks.length === 0 && (
-        <p className="empty-message">
-          No books found. Try another search!
-        </p>
+          {filteredBooks.length === 0 && (
+            <p className="empty-message">
+              No books found. Try another search!
+            </p>
+          )}
+        </>
       )}
-
     </div>
   )
 }
