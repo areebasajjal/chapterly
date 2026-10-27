@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import './Discover.css'
 
-// Information about each book received from MongoDB
+// Define the information we receive for each book
 type Book = {
   _id: string
   title: string
@@ -11,26 +11,26 @@ type Book = {
   language?: string
   coverUrl?: string
 
-  // Authors linked to the book
+  // Authors connected to this book in MongoDB
   authorIds?: {
     _id: string
     name: string
   }[]
 
-  // Genres linked to the book
+  // Genres connected to this book in MongoDB
   genreIds?: {
     _id: string
     name: string
   }[]
 }
 
-// Information about a genre
+// Define the information we receive for each genre
 type Genre = {
   _id: string
   name: string
 }
 
-// Background colors for books without cover images
+// Background colors used if a book cover is unavailable
 const coverColors = [
   '#56736B',
   '#C6A1A0',
@@ -41,28 +41,29 @@ const coverColors = [
 ]
 
 function Discover() {
-  // Books returned by our Express API
+  // Store the books retrieved from MongoDB
   const [books, setBooks] = useState<Book[]>([])
 
-  // Genres used in the dropdown
+  // Store the available genres for our dropdown
   const [genres, setGenres] = useState<Genre[]>([])
 
-  // Text entered into the search bar
+  // Store the text entered in the search bar
   const [search, setSearch] = useState('')
 
-  // MongoDB ID of the selected genre
-  // An empty string means "All Genres"
+  // Store the selected genre's MongoDB ID
+  // An empty string means we want all genres
   const [selectedGenre, setSelectedGenre] = useState('')
 
-  // Loading and error messages
+  // Track loading and error messages
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [genreError, setGenreError] = useState('')
 
-  
+  // --------------------------------------------------
   // LOAD GENRES FROM MONGODB
+  // --------------------------------------------------
 
-  // Fetch our genres when the page first opens
+  // Get all genres once when the Discover page opens
   useEffect(() => {
     const controller = new AbortController()
 
@@ -77,90 +78,83 @@ function Discover() {
         return response.json()
       })
       .then((result) => {
+        // Save the genres so they appear in our dropdown
         if (!controller.signal.aborted) {
           setGenres(result.data)
         }
       })
-      .catch(() => {
-        if (!controller.signal.aborted) {
+      .catch((error) => {
+        // Ignore requests cancelled when the page closes
+        if (error.name !== 'AbortError') {
           setGenreError('Could not load genre options.')
         }
       })
 
-    // Cancel the request if the page closes
     return () => controller.abort()
   }, [])
 
+  // --------------------------------------------------
+  // LOAD BOOKS AND APPLY GENRE FILTERING
+  // --------------------------------------------------
 
-  // SEARCH AND FILTER BOOKS THROUGH MONGODB
-
-
-  // Run whenever the user changes their search or genre
+  // Run this whenever the selected genre changes
   useEffect(() => {
+    // Cancel an old request if the user switches genres
     const controller = new AbortController()
 
-    // Build the query parameters for our Express API
-    const params = new URLSearchParams()
-
-    // Include a genre ID if the user selected one
-    if (selectedGenre) {
-      params.set('genre', selectedGenre)
-    }
-
-    // Include search text if the user typed something
-    if (search.trim()) {
-      params.set('search', search.trim())
-    }
-
-    // Create the final API URL
-    // Example: /api/books?genre=GENRE_ID&search=Harry
-    const query = params.toString()
-
-    const url = query
-      ? `http://localhost:5050/api/books?${query}`
+    // No selected genre means we request all books
+    // Otherwise, we send the genre ID to Express
+    const url = selectedGenre
+      ? `http://localhost:5050/api/books?genre=${selectedGenre}`
       : 'http://localhost:5050/api/books'
 
-    // Wait briefly before searching to avoid too many requests
-    const timer = setTimeout(() => {
-      fetch(url, {
-        signal: controller.signal
+    fetch(url, {
+      signal: controller.signal
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch books')
+        }
+
+        return response.json()
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to fetch books')
-          }
+      .then((result) => {
+        // MongoDB has already filtered the books by genre
+        if (!controller.signal.aborted) {
+          setBooks(result.data)
+        }
+      })
+      .catch((error) => {
+        // Do not show an error for intentionally cancelled requests
+        if (error.name !== 'AbortError') {
+          setError('Could not load books from MongoDB.')
+        }
+      })
+      .finally(() => {
+        // Finish loading only if this request was not cancelled
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      })
 
-          return response.json()
-        })
-        .then((result) => {
-          // MongoDB has already searched and filtered the books
-          if (!controller.signal.aborted) {
-            setBooks(result.data)
-          }
-        })
-        .catch((error) => {
-          // Ignore requests cancelled by another search
-          if (error.name !== 'AbortError') {
-            setError('Could not load books from MongoDB.')
-          }
-        })
-        .finally(() => {
-          if (!controller.signal.aborted) {
-            setLoading(false)
-          }
-        })
-    }, 300)
+    // Clean up the previous request when the genre changes
+    return () => controller.abort()
+  }, [selectedGenre])
 
-    // Cancel old requests when the user changes the filters
-    return () => {
-      clearTimeout(timer)
-      controller.abort()
-    }
-  }, [search, selectedGenre])
+  // --------------------------------------------------
+  // SEARCH BOOKS BY TITLE
+  // --------------------------------------------------
 
-  
+  // Search within the books returned by our backend
+  // Genre filtering happens in MongoDB, but title
+  // searching currently happens here in React
+  const filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(search.toLowerCase())
+  )
+
+  // --------------------------------------------------
   // DISPLAY THE DISCOVER PAGE
-
+  // --------------------------------------------------
 
   return (
     <div className="discover">
@@ -174,39 +168,35 @@ function Discover() {
       {/* Search bar and genre dropdown */}
       <div className="discover-filters">
 
-        {/* Search for books directly through MongoDB */}
+        {/* Search books by their titles */}
         <input
           type="search"
           placeholder="Search books..."
           aria-label="Search books"
           value={search}
-          onChange={(e) => {
-            // Save what the user types
-            setSearch(e.target.value)
-
-            // Show loading while we search again
-            setLoading(true)
-            setError('')
-          }}
+          onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* Filter books by their genre */}
+        {/* Filter books using genres stored in MongoDB */}
         <select
           className="genre-select"
           aria-label="Filter books by genre"
           value={selectedGenre}
           onChange={(e) => {
-            // Save the selected genre's MongoDB ID
+            // Save the genre the user selected
             setSelectedGenre(e.target.value)
 
-            // Request a new set of matching books
+            // Show loading while the new books are requested
             setLoading(true)
+
+            // Clear any error from the previous request
             setError('')
           }}
         >
+          {/* Empty value means no genre filter */}
           <option value="">All Genres</option>
 
-          {/* Get the dropdown options from our genres collection */}
+          {/* Create an option for every genre in MongoDB */}
           {genres.map((genre) => (
             <option
               key={genre._id}
@@ -219,29 +209,36 @@ function Discover() {
 
       </div>
 
-      {/* Error messages */}
-      {genreError && <p role="alert">{genreError}</p>}
+      {/* Show an error if genres cannot be retrieved */}
+      {genreError && (
+        <p role="alert">{genreError}</p>
+      )}
 
+      {/* Show a message while books are being loaded */}
       {loading && <p>Loading books...</p>}
 
+      {/* Show an error if the books request fails */}
       {error && <p role="alert">{error}</p>}
 
-      {/* Display results when the request finishes */}
+      {/* Display books only when loading has finished */}
       {!loading && !error && (
         <>
 
-          {/* Show the number of books returned by MongoDB */}
+          {/* Number of books matching the current filters */}
           <p className="book-count">
-            {books.length} books found
+            {filteredBooks.length} books found
           </p>
 
           <div className="book-grid">
 
-            {/* Create a card for each book */}
-            {books.map((book, index) => (
-              <div className="book-card" key={book._id}>
+            {/* Create one card for every matching book */}
+            {filteredBooks.map((book, index) => (
+              <div
+                className="book-card"
+                key={book._id}
+              >
 
-                {/* Click the cover to open the Book Details page */}
+                {/* Clicking the cover opens the book details */}
                 <Link
                   to={`/books/${book._id}`}
                   className="book-cover"
@@ -252,7 +249,7 @@ function Discover() {
                   }}
                 >
 
-                  {/* Placeholder shown when a cover is unavailable */}
+                  {/* Placeholder if the book has no cover image */}
                   <span className="cover-symbol">✦</span>
 
                   <span className="cover-title">
@@ -263,7 +260,7 @@ function Discover() {
                     {book.publicationYear || 'Chapterly'}
                   </span>
 
-                  {/* Real book cover retrieved from MongoDB */}
+                  {/* Show the actual cover stored in MongoDB */}
                   {book.coverUrl && (
                     <img
                       src={book.coverUrl}
@@ -271,7 +268,7 @@ function Discover() {
                       className="book-cover-image"
                       loading="lazy"
                       onError={(e) => {
-                        // Reveal the placeholder if an image fails
+                        // Hide broken covers to reveal the placeholder
                         e.currentTarget.style.display = 'none'
                       }}
                     />
@@ -282,7 +279,7 @@ function Discover() {
                 {/* Book title */}
                 <h3>{book.title}</h3>
 
-                {/* Display real author names */}
+                {/* Display the names of the book's authors */}
                 <p className="book-author">
                   {book.authorIds
                     ?.map((author) => author.name)
@@ -296,7 +293,7 @@ function Discover() {
                     : 'Publication year unavailable'}
                 </p>
 
-                {/* Genre badges */}
+                {/* Display all genres linked to this book */}
                 <div className="book-genres">
                   {book.genreIds?.map((genre) => (
                     <span
@@ -308,18 +305,17 @@ function Discover() {
                   ))}
                 </div>
 
-                {/* Book language */}
+                {/* Display the book's language */}
                 <span className="genre-tag">
                   {book.language?.toUpperCase() || 'Unknown'}
                 </span>
 
               </div>
             ))}
-
           </div>
 
-          {/* Show a message when MongoDB finds no matching books */}
-          {books.length === 0 && (
+          {/* Message shown if no books match the filters */}
+          {filteredBooks.length === 0 && (
             <p className="empty-message">
               No books found. Try another search or genre!
             </p>
