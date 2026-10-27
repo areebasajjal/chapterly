@@ -39,9 +39,10 @@ const bookSchema = new Schema({
   }],
 
   publisherId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Publisher'
-  }
+  type: Schema.Types.ObjectId,
+  ref: 'Publisher',
+  default: null
+}
 
 }, {
   timestamps: true,

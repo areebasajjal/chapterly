@@ -1,0 +1,348 @@
+
+/* Full-screen login background */
+.login-page {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  min-height: 100dvh;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+  overflow: hidden;
+
+  font-family: 'Nunito', sans-serif;
+
+  /* Soft green and warm cream background */
+  background:
+    radial-gradient(
+      circle at 8% 15%,
+      rgba(125, 158, 130, 0.20),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 90% 85%,
+      rgba(201, 174, 137, 0.22),
+      transparent 36%
+    ),
+    linear-gradient(
+      135deg,
+      #f7f8f2 0%,
+      #fcfaf6 50%,
+      #f3f0e7 100%
+    );
+}
+
+
+/* Decorative rings in the top-left corner */
+.login-page::before {
+  content: '';
+  position: absolute;
+
+  width: 520px;
+  height: 520px;
+
+  top: -280px;
+  left: -180px;
+
+  border: 1px solid rgba(65, 100, 76, 0.10);
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 65px rgba(65, 100, 76, 0.025),
+    0 0 0 135px rgba(65, 100, 76, 0.018);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/* Decorative rings in the bottom-right corner */
+.login-page::after {
+  content: '';
+  position: absolute;
+
+  width: 580px;
+  height: 580px;
+
+  right: -270px;
+  bottom: -340px;
+
+  border: 1px solid rgba(159, 123, 80, 0.13);
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 0 75px rgba(159, 123, 80, 0.025),
+    0 0 0 150px rgba(159, 123, 80, 0.015);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+
+/* White card containing the login form */
+.login-card {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 800px;
+  box-sizing: border-box;
+
+  padding: 45px 40px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  border: 1px solid rgba(220, 226, 216, 0.9);
+  border-radius: 20px;
+
+  box-shadow:
+    0 20px 60px rgba(40, 70, 52, 0.08),
+    0 4px 15px rgba(40, 70, 52, 0.025);
+}
+
+
+/* Center the welcome heading */
+.login-heading {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Small decorative book-themed symbol */
+.login-icon {
+  width: 48px;
+  height: 48px;
+
+  margin: 0 auto 18px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #e6eee5;
+  color: #294a3d;
+
+  border-radius: 14px;
+  font-size: 26px;
+}
+
+/* Small uppercase text above the heading */
+.login-eyebrow {
+  margin-bottom: 12px;
+
+  color: #7c9782;
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+/* Welcome back heading */
+.login-heading h1 {
+  margin: 0;
+
+  color: #294a3d;
+
+  font-family: 'Fraunces', serif;
+  font-size: 34px;
+  font-weight: 600;
+}
+
+/* Short description below the heading */
+.login-description {
+  margin-top: 12px;
+
+  color: #7d887e;
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+
+/* Arrange form fields vertically */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Each field contains a label and an input */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Email and password labels */
+.login-field label {
+  color: #294a3d;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Email and password input boxes */
+.login-field input {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 14px 16px;
+
+  border: 1px solid #e0e5dd;
+  border-radius: 10px;
+
+  background-color: #fafbf8;
+  color: #294a3d;
+
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+/* Highlight an input when the reader selects it */
+.login-field input:focus {
+  outline: none;
+
+  border-color: #749981;
+
+  box-shadow:
+    0 0 0 3px rgba(116, 153, 129, 0.12);
+}
+
+
+
+/* Display login errors in a soft red background */
+.login-error {
+  margin: 0;
+  padding: 12px;
+
+  border-radius: 9px;
+
+  background-color: #fff2ef;
+  color: #ad5148;
+
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Main login button */
+.login-button {
+  width: 100%;
+  padding: 14px;
+
+  border: none;
+  border-radius: 10px;
+
+  background-color: #294a3d;
+  color: #ffffff;
+
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s;
+}
+
+/* Slightly lighten the button on hover */
+.login-button:hover:not(:disabled) {
+  background-color: #3e6955;
+}
+
+/* Disable interaction while logging in */
+.login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+
+/* 
+   FOOTER
+ */
+
+/* Small message below the login form */
+.login-footer {
+  margin-top: 40px;
+
+  text-align: center;
+
+  color: #7e877e;
+
+  font-size: 20px;
+  font-style: italic, bold;
+}
+
+
+@media (max-width: 500px) {
+
+  /* Reduce spacing on smaller screens */
+  .login-card {
+    padding: 32px 24px;
+  }
+
+  /* Make the welcome heading slightly smaller */
+  .login-heading h1 {
+    font-size: 29px;
+  }
+
+  /* Keep the background decorations subtle */
+  .login-page::before,
+  .login-page::after {
+    opacity: 0.6;
+  }
+}
+
+
+/* Link between Login and Sign Up pages */
+.auth-link {
+  color: #294a3d;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Success message after creating an account */
+.register-success {
+  text-align: center;
+}
+
+.register-success h2 {
+  color: #294a3d;
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+}
+
+.register-success p {
+  color: #7d887e;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+/* Make the login link look like our main button */
+.register-login-button {
+  display: block;
+  box-sizing: border-box;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* The Sign Up card can scroll on short screens */
+.login-page {
+  overflow-y: auto;
+}
+
+
+
