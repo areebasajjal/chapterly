@@ -193,7 +193,6 @@
 }
 
 
-
 /* Make the author's name stand out beneath the book title */
 .book-card .book-author {
   color: #294A3D;
@@ -208,6 +207,46 @@
 
   margin: 10px 0 8px;
 }
+
+
+/* Keep the search bar and genre filter side by side */
+.discover-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Allow the search bar to use the remaining space */
+.discover-filters input {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+/* Style the genre dropdown to match Chapterly */
+.discover-filters .genre-select {
+  min-width: 180px;
+  padding: 13px 16px;
+
+  background-color: #faf8f4;
+  color: #294a3d;
+
+  border: 1px solid #e3e3da;
+  border-radius: 11px;
+
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+/* Highlight the dropdown when the user selects it */
+.discover-filters .genre-select:focus {
+  outline: 2px solid #8ead93;
+  outline-offset: 2px;
+}
+
 
 
 
