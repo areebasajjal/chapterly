@@ -171,3 +171,80 @@
     padding: 18px;
   }
 }
+
+
+/* Keep the book link separate from the status dropdown. */
+.library-book-link {
+  display: block;
+  color: #294a3d;
+  text-decoration: none;
+}
+
+.library-book-link:hover h3 {
+  text-decoration: underline;
+}
+
+/* Reading status selector. */
+.library-status-control {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+}
+
+.library-status-control label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #758578;
+}
+
+.library-status-control select {
+  width: 100%;
+  padding: 10px;
+  background: #fffdfa;
+  border: 1px solid #dfe5dc;
+  border-radius: 9px;
+  color: #294a3d;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.library-status-control select:focus {
+  outline: 2px solid #82a08c;
+  outline-offset: 2px;
+}
+
+.library-status-control select:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.library-moving {
+  font-size: 12px;
+  color: #758578;
+  margin-top: 8px;
+}
+
+
+.library-remove-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #d9b7b3;
+  border-radius: 9px;
+  color: #a34f48;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.library-remove-button:hover:not(:disabled) {
+  background: #f9eeec;
+}
+
+.library-remove-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

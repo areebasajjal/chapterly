@@ -1,0 +1,88 @@
+
+.book-library-control {
+  max-width: 420px;
+  padding: 24px;
+  background: #fffdfa;
+  border: 1px solid #e5e8df;
+  border-radius: 16px;
+  color: #294a3d;
+}
+
+.book-library-control h2 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  margin: 0 0 12px;
+}
+
+.book-library-message {
+  color: #758578;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.book-library-control label {
+  display: block;
+  color: #53675a;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.book-library-control select {
+  width: 100%;
+  padding: 12px;
+  background: white;
+  border: 1px solid #dfe5dc;
+  border-radius: 9px;
+  color: #294a3d;
+  font-size: 14px;
+  margin-bottom: 14px;
+  cursor: pointer;
+}
+
+.book-library-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 18px;
+  background: #294a3d;
+  border: none;
+  border-radius: 9px;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.book-library-button:hover:not(:disabled) {
+  background: #365c49;
+}
+
+.book-library-button:disabled {
+  background: #a0b0a5;
+  cursor: not-allowed;
+}
+
+.book-library-success {
+  color: #32734f;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.book-library-error {
+  color: #a34f48;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.book-library-view {
+  display: inline-block;
+  margin-top: 16px;
+  color: #294a3d;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+}
