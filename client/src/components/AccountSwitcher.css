@@ -1,0 +1,289 @@
+ .chapterly-account-switcher {
+     position: relative;
+     width: 100%;
+ }
+
+ .chapterly-account-trigger {
+     width: 100%;
+     min-width: 0;
+     border: 1px solid transparent;
+     background: transparent;
+     display: flex;
+     align-items: center;
+     gap: 12px;
+     padding: 10px 8px;
+     border-radius: 12px;
+     cursor: pointer;
+     text-align: left;
+     color: inherit;
+ }
+
+ .chapterly-account-trigger:hover,
+ .chapterly-account-trigger[aria-expanded="true"] {
+     background: #eef2eb;
+     border-color: #dee7dc;
+ }
+
+ .chapterly-account-main-avatar,
+ .chapterly-account-mini-avatar {
+     flex: none;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     overflow: hidden;
+     color: #fff;
+     background: #87b19b;
+     font-weight: 700;
+     border-radius: 50%;
+ }
+
+ .chapterly-account-main-avatar {
+     width: 42px;
+     height: 42px;
+     font-size: 18px;
+ }
+
+ .chapterly-account-mini-avatar {
+     width: 36px;
+     height: 36px;
+     font-size: 14px;
+ }
+
+ .chapterly-account-main-avatar img,
+ .chapterly-account-mini-avatar img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+ }
+
+ .chapterly-account-main-text {
+     display: flex;
+     flex-direction: column;
+     align-items: flex-start;
+     gap: 3px;
+     flex: 1;
+     min-width: 0;
+ }
+
+ .chapterly-account-main-text strong {
+     font-size: 12px;
+     color: #294a3d;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     max-width: 100%;
+ }
+
+ .chapterly-account-main-text small {
+     font-size: 13px;
+     color: #fafbfa;
+     text-transform: capitalize;
+ }
+
+ .chapterly-account-trigger>svg {
+     color: #6d8273;
+     transition: transform 0.2s;
+ }
+
+ .chapterly-chevron-active {
+     transform: rotate(180deg);
+ }
+
+ .chapterly-account-popover {
+     position: absolute;
+     z-index: 100;
+     left: 0;
+     right: 0;
+     bottom: calc(100% + 12px);
+     background: #fffdf8;
+     border: 1px solid #dfe7db;
+     border-radius: 15px;
+     box-shadow: 0 14px 42px #1a332625;
+     padding: 12px;
+     color: #294a3d;
+ }
+
+ .chapterly-account-popover-heading {
+     display: flex;
+     justify-content: space-between;
+     gap: 8px;
+     align-items: center;
+     padding: 5px 5px 12px;
+ }
+
+ .chapterly-account-popover-heading strong {
+     font-size: 14px;
+ }
+
+ .chapterly-account-popover-heading span {
+     font-size: 11px;
+     color: #829383;
+ }
+
+ .chapterly-account-list {
+     overflow-y: auto;
+     max-height: 235px;
+     scrollbar-width: thin;
+     padding-right: 2px;
+ }
+
+ .chapterly-account-entry {
+     display: flex;
+     align-items: center;
+     border-radius: 9px;
+ }
+
+ .chapterly-account-entry:hover {
+     background: #f1f5ee;
+ }
+
+ .chapterly-account-option {
+     min-width: 0;
+     flex: 1;
+     display: flex;
+     align-items: center;
+     gap: 9px;
+     padding: 9px 6px;
+     border: 0;
+     background: transparent;
+     text-align: left;
+     cursor: pointer;
+     color: #2e4839;
+ }
+
+ .chapterly-account-option-text {
+     display: flex;
+     flex-direction: column;
+     min-width: 0;
+     gap: 3px;
+     flex: 1;
+ }
+
+ .chapterly-account-option-text strong {
+     font-size: 12px;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+ }
+
+ .chapterly-account-option-text small {
+     font-size: 10px;
+     color: #738578;
+     white-space: nowrap;
+     overflow: hidden;
+     text-overflow: ellipsis;
+ }
+
+ .chapterly-account-option>svg {
+     flex: none;
+     color: #5d8867;
+ }
+
+ .chapterly-account-forget {
+     border: 0;
+     background: transparent;
+     color: #9caaa0;
+     padding: 8px 5px;
+     cursor: pointer;
+ }
+
+ .chapterly-account-forget:hover {
+     color: #a34848;
+ }
+
+ .chapterly-account-actions {
+     display: flex;
+     flex-direction: column;
+     border-top: 1px solid #e8eee4;
+     padding-top: 9px;
+     margin-top: 8px;
+ }
+
+ .chapterly-account-actions a {
+     display: flex;
+     gap: 9px;
+     align-items: center;
+     padding: 9px 7px;
+     text-decoration: none;
+     border-radius: 8px;
+     color: #426854;
+     font-weight: 600;
+     font-size: 12px;
+ }
+
+ .chapterly-account-actions a:hover {
+     background: #eef2eb;
+ }
+
+ .chapterly-account-hint {
+     font-size: 10px;
+     line-height: 1.5;
+     margin: 8px 5px 3px;
+     color: #829383;
+ }
+
+ .chapterly-account-password-form {
+     display: flex;
+     flex-direction: column;
+     gap: 9px;
+ }
+
+ .chapterly-account-password-form h3 {
+     margin: 4px 0 0;
+     font-size: 15px;
+ }
+
+ .chapterly-account-caption {
+     font-size: 11px;
+     color: #6d8273;
+     margin: 0 0 3px;
+     overflow-wrap: anywhere;
+ }
+
+ .chapterly-account-back {
+     align-self: flex-start;
+     border: 0;
+     background: transparent;
+     cursor: pointer;
+     color: #426854;
+     font-size: 12px;
+     padding: 4px 0;
+ }
+
+ .chapterly-account-password-form label {
+     font-weight: 600;
+     font-size: 12px;
+ }
+
+ .chapterly-account-password-form input {
+     width: 100%;
+     box-sizing: border-box;
+     min-height: 37px;
+     border-radius: 8px;
+     border: 1px solid #cfdbcc;
+     padding: 8px 10px;
+     outline-color: #426854;
+     background: #fff;
+     color: #294a3d;
+ }
+
+ .chapterly-account-submit {
+     border: 0;
+     background: #294a3d;
+     color: white;
+     border-radius: 8px;
+     padding: 11px 12px;
+     cursor: pointer;
+     font-weight: 600;
+ }
+
+ .chapterly-account-submit:disabled {
+     opacity: .6;
+     cursor: not-allowed;
+ }
+
+ .chapterly-account-error {
+     color: #b04747;
+     font-size: 11px;
+     margin: 0;
+ }
