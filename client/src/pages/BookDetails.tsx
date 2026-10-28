@@ -1,8 +1,13 @@
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import BookLibraryControl from '../components/BookLibraryControl'
 import './BookDetails.css'
+
+import BookFeedback, {
+  type BookFeedbackProps
+} from '../components/BookFeedback'
+
 
 // Publisher information connected to a book or edition.
 type Publisher = {
@@ -32,6 +37,9 @@ type Book = {
   }[]
 
   publisherId?: Publisher | null
+
+  ratings?: BookFeedbackProps['ratings']
+reviews?: BookFeedbackProps['reviews']
 }
 
 // Edition information received from MongoDB.
@@ -369,7 +377,36 @@ function BookDetails() {
               'No description available yet.'}
           </p>
 
-          {/* Existing Add to Library functionality */}
+                <BookFeedback
+        ratings={book.ratings}
+        reviews={book.reviews}
+      />
+
+
+<Link
+  to={`/books/${book._id}/quotes`}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              marginTop: '20px',
+              padding: '12px 20px',
+              backgroundColor: '#294A3D',
+              color: '#FFFFFF',
+              borderRadius: '20px',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: 600,
+              transition: 'background-color 0.2s ease'
+            }}
+>
+  <span aria-hidden="true">❝</span>
+  View Quotes & Highlights
+  <span aria-hidden="true">❝</span>
+</Link>
+
+                {/* Existing Add to Library functionality */}
           <BookLibraryControl />
 
         </div>

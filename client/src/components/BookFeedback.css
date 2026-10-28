@@ -1,0 +1,173 @@
+
+.chapterly-feedback {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e9e2;
+}
+
+.chapterly-feedback-heading,
+.chapterly-reviews-heading,
+.chapterly-review-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chapterly-feedback-heading h3,
+.chapterly-reviews-heading h3 {
+  margin: 0;
+  color: #294a3d;
+}
+
+.chapterly-demo-tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #edf2e9;
+  color: #52745d;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chapterly-rating-summary {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 26px;
+  align-items: center;
+  padding: 22px;
+  margin-top: 18px;
+  border-radius: 14px;
+  background: #faf9f5;
+  border: 1px solid #eae6dc;
+}
+
+.chapterly-rating-average {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.chapterly-rating-average strong {
+  font-size: 40px;
+  line-height: 1.1;
+  color: #294a3d;
+}
+
+.chapterly-rating-stars {
+  color: #ba9256;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.chapterly-rating-average small,
+.chapterly-rating-row small {
+  color: #718078;
+}
+
+.chapterly-rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chapterly-rating-row {
+  display: grid;
+  grid-template-columns: 34px 1fr 18px;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: #65766b;
+}
+
+.chapterly-rating-track {
+  height: 8px;
+  border-radius: 20px;
+  background: #e4e9df;
+  overflow: hidden;
+}
+
+.chapterly-rating-fill {
+  height: 100%;
+  background: #718b79;
+  border-radius: 20px;
+}
+
+.chapterly-reviews-heading {
+  margin-top: 30px;
+  margin-bottom: 16px;
+}
+
+.chapterly-reviews-heading span {
+  color: #718078;
+  font-size: 13px;
+}
+
+.chapterly-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chapterly-review-card {
+  padding: 18px;
+  background: #faf9f5;
+  border: 1px solid #eae6dc;
+  border-radius: 12px;
+}
+
+.chapterly-review-top h4 {
+  margin: 0;
+  color: #294a3d;
+  font-size: 15px;
+}
+
+.chapterly-review-date {
+  color: #849086;
+  font-size: 12px;
+  margin: 8px 0 12px;
+}
+
+.chapterly-review-content {
+  font-size: 14px;
+  color: #485b4d;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.chapterly-feedback-empty {
+  padding: 14px;
+  color: #819084;
+  background: #f8f7f3;
+  border: 1px dashed #e2e5dc;
+  border-radius: 10px;
+  margin-top: 14px;
+}
+
+.chapterly-spoiler-button {
+  width: 100%;
+  padding: 12px;
+  background: #edf2e9;
+  color: #294a3d;
+  border: 1px solid #d7e2d5;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.chapterly-hide-spoiler {
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #52745d;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .chapterly-rating-summary {
+    grid-template-columns: 1fr;
+  }
+}
