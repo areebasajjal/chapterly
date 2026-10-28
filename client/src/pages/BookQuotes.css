@@ -1,0 +1,158 @@
+
+.book-quotes-page {
+  max-width: 950px;
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+  color: #294a3d;
+}
+
+.book-quotes-back {
+  display: inline-block;
+  margin-bottom: 30px;
+  color: #52745d;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.book-quotes-header {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+
+.book-quotes-cover {
+  width: 105px;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 7px;
+  box-shadow: 0 5px 18px #00000018;
+}
+
+.book-quotes-eyebrow {
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+  color: #82968a;
+}
+
+.book-quotes-header h1 {
+  font-size: clamp(25px, 4vw, 38px);
+  margin: 8px 0;
+  line-height: 1.2;
+}
+
+.book-quotes-header p {
+  color: #6f8175;
+}
+
+.book-quotes-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 42px;
+}
+
+.book-quotes-stats > div {
+  background: #f8f7f2;
+  border: 1px solid #e6e8df;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.book-quotes-stats strong {
+  font-size: 27px;
+  color: #294a3d;
+}
+
+.book-quotes-stats span {
+  font-size: 12px;
+  color: #718078;
+}
+
+.book-quotes-section {
+  margin-top: 34px;
+}
+
+.book-quotes-section h2 {
+  font-size: 23px;
+  margin-bottom: 8px;
+}
+
+.book-quotes-description {
+  color: #7b8a80;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.book-quotes-list {
+  display: grid;
+  gap: 15px;
+}
+
+.book-quote-card {
+  padding: 24px;
+  background: #faf9f5;
+  border: 1px solid #e7e8de;
+  border-radius: 14px;
+}
+
+.book-quote-type {
+  color: #405345;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.book-quote-text {
+  color: #334a3e;
+  font-size: 17px;
+  line-height: 1.8;
+  margin: 15px 0;
+}
+
+.book-quote-source {
+  color: #52745d;
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.book-quotes-empty {
+  padding: 30px;
+  background: #f8f7f2;
+  border-radius: 12px;
+  text-align: center;
+  color: #7b8a80;
+}
+
+@media (max-width: 600px) {
+  .book-quotes-header {
+    gap: 16px;
+  }
+
+  .book-quotes-cover {
+    width: 80px;
+  }
+
+  .book-quotes-stats {
+    gap: 8px;
+  }
+
+  .book-quotes-stats > div {
+    padding: 14px 6px;
+  }
+
+  .book-quotes-stats span {
+    font-size: 10px;
+  }
+
+  .book-quote-card {
+    padding: 18px;
+  }
+}
