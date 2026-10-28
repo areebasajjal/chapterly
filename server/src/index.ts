@@ -1,7 +1,7 @@
 
 import 'dotenv/config'
 
-import express from 'express'
+import express, { type Request } from 'express'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
@@ -13,10 +13,10 @@ import { Genre } from './models/Genres'
 import { Edition } from './models/Editions'
 import { User } from './models/Usertemp'
 import { Profile } from './models/profilestemp'
+import { Bookshelf } from './models/Bookshelvess'
 
 import './models/Authors'
 import './models/Publsihers'
-import './models/Bookshelvess'
 import './models/ShelfEntries'
 import './models/ReadingSessions'
 import './models/Reviews'
@@ -24,6 +24,7 @@ import './models/Ratings'
 import './models/Quotes'
 import './models/ReadingChallenges'
 import './models/ChallengeParticipants'
+
 
 const app = express()
 
@@ -41,7 +42,14 @@ const cookieSettings = {
   path: '/'
 }
 
-// Allow React to send requests and login cookies to Express.
+const DEFAULT_SHELF_NAMES = [
+  'Want to Read',
+  'Currently Reading',
+  'Read'
+]
+
+
+// Allow our React application to communicate with Express.
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
@@ -49,6 +57,57 @@ app.use(cors({
 
 app.use(express.json())
 app.use(cookieParser())
+
+
+// Get the logged-in user's ID from their authentication cookie.
+function getSessionUserId(req: Request): string | null {
+  const token = req.cookies?.[COOKIE_NAME]
+
+  if (typeof token !== 'string' || !JWT_SECRET) {
+    return null
+  }
+
+  try {
+    const payload = jwt.verify(token, JWT_SECRET, {
+      algorithms: ['HS256']
+    })
+
+    if (
+      typeof payload === 'string' ||
+      typeof payload.sub !== 'string' ||
+      !mongoose.isObjectIdOrHexString(payload.sub)
+    ) {
+      return null
+    }
+
+    return payload.sub
+
+  } catch {
+    return null
+  }
+}
+
+
+// Create the three default shelves for existing accounts.
+// Existing shelves are kept instead of being duplicated.
+async function ensureDefaultShelves(userId: mongoose.Types.ObjectId) {
+  await Bookshelf.bulkWrite(
+    DEFAULT_SHELF_NAMES.map((name) => ({
+      updateOne: {
+        filter: { userId, name },
+        update: {
+          $setOnInsert: {
+            userId,
+            name,
+            isSystem: true,
+            description: ''
+          }
+        },
+        upsert: true
+      }
+    }))
+  )
+}
 
 
 // Check whether Express and MongoDB are running.
@@ -62,7 +121,7 @@ app.get('/health', (req, res) => {
 })
 
 
-// Register a new reader and create their profile.
+// Register a user and automatically create their profile and bookshelves.
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { displayName, email, password } = req.body ?? {}
@@ -125,7 +184,7 @@ app.post('/api/auth/register', async (req, res) => {
       })
     }
 
-    // Store a secure password hash instead of the actual password.
+    // Hash the password so we never store it as plain text.
     const passwordHash = await bcrypt.hash(password, 12)
 
     const user = new User({
@@ -140,10 +199,20 @@ app.post('/api/auth/register', async (req, res) => {
       displayName: cleanName
     })
 
-    // A transaction saves both documents or neither of them.
+    // Save the user, profile and three shelves in one transaction.
+    // If something fails, MongoDB rolls back all these changes.
     await mongoose.connection.transaction(async (session) => {
       await user.save({ session })
       await profile.save({ session })
+
+      await Bookshelf.insertMany(
+        DEFAULT_SHELF_NAMES.map((name) => ({
+          userId: user._id,
+          name,
+          isSystem: true
+        })),
+        { session }
+      )
     })
 
     return res.status(201).json({
@@ -161,7 +230,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(409).json({
         error: {
           code: 'DUPLICATE_ACCOUNT',
-          message: 'An account with this email already exists.'
+          message: 'An account or bookshelf already exists.'
         }
       })
     }
@@ -178,7 +247,7 @@ app.post('/api/auth/register', async (req, res) => {
 })
 
 
-// Check the password and sign the reader in.
+// Log in a user after checking their email and password.
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body ?? {}
@@ -197,7 +266,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const cleanEmail = email.trim().toLowerCase()
 
-    // passwordHash is hidden by default in the User schema.
+    // Retrieve the password hash so bcrypt can verify it.
     const user = await User.findOne({
       email: cleanEmail
     }).select('+passwordHash')
@@ -238,7 +307,10 @@ app.post('/api/auth/login', async (req, res) => {
       userId: user._id
     })
 
-    // The token identifies the reader for later requests.
+    // Give older registered users any missing default shelves.
+    await ensureDefaultShelves(user._id)
+
+    // Create a session token that expires after one hour.
     const token = jwt.sign(
       { sub: user._id.toString() },
       JWT_SECRET!,
@@ -248,7 +320,6 @@ app.post('/api/auth/login', async (req, res) => {
       }
     )
 
-    // HTTP-only cookies cannot be read by frontend JavaScript.
     res.cookie(COOKIE_NAME, token, {
       ...cookieSettings,
       maxAge: 60 * 60 * 1000
@@ -277,47 +348,16 @@ app.post('/api/auth/login', async (req, res) => {
 })
 
 
-// Return the details of the currently logged-in reader.
+// Get information about the currently logged-in reader.
 app.get('/api/auth/me', async (req, res) => {
   try {
-    const token = req.cookies?.[COOKIE_NAME]
+    const userId = getSessionUserId(req)
 
-    if (typeof token !== 'string') {
+    if (!userId) {
       return res.status(401).json({
         error: {
           code: 'NOT_AUTHENTICATED',
           message: 'Please log in.'
-        }
-      })
-    }
-
-    let userId: string
-
-    try {
-      const payload = jwt.verify(token, JWT_SECRET!, {
-        algorithms: ['HS256']
-      })
-
-      if (
-        typeof payload === 'string' ||
-        typeof payload.sub !== 'string' ||
-        !mongoose.isObjectIdOrHexString(payload.sub)
-      ) {
-        return res.status(401).json({
-          error: {
-            code: 'INVALID_SESSION',
-            message: 'Please log in again.'
-          }
-        })
-      }
-
-      userId = payload.sub
-
-    } catch {
-      return res.status(401).json({
-        error: {
-          code: 'INVALID_SESSION',
-          message: 'Your login session is invalid or expired.'
         }
       })
     }
@@ -360,7 +400,7 @@ app.get('/api/auth/me', async (req, res) => {
 })
 
 
-// Remove the login cookie when a reader logs out.
+// Log out the reader by removing their login cookie.
 app.post('/api/auth/logout', (req, res) => {
   res.clearCookie(COOKIE_NAME, cookieSettings)
 
@@ -370,7 +410,60 @@ app.post('/api/auth/logout', (req, res) => {
 })
 
 
-// Get all books, optionally filtering by genre or title.
+// Retrieve the bookshelves belonging to the logged-in reader.
+app.get('/api/me/bookshelves', async (req, res) => {
+  try {
+    const userId = getSessionUserId(req)
+
+    if (!userId) {
+      return res.status(401).json({
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'Please log in to view your shelves.'
+        }
+      })
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_SESSION',
+          message: 'Your account is not available.'
+        }
+      })
+    }
+
+    // Only find shelves owned by this specific user.
+    const shelves = await Bookshelf.find({
+      userId: user._id
+    }).sort({
+      isSystem: -1,
+      createdAt: 1
+    })
+
+    return res.json({
+      data: shelves,
+      meta: {
+        total: shelves.length
+      }
+    })
+
+  } catch (error) {
+    console.error('Bookshelf error:', error)
+
+    return res.status(500).json({
+      error: {
+        code: 'FETCH_ERROR',
+        message: 'Could not retrieve your bookshelves.'
+      }
+    })
+  }
+})
+
+
+// Retrieve all books, with optional genre and title filters.
 app.get('/api/books', async (req, res) => {
   try {
     const genreId = req.query.genre
@@ -391,7 +484,10 @@ app.get('/api/books', async (req, res) => {
       })
     }
 
-    if (search !== undefined && typeof search !== 'string') {
+    if (
+      search !== undefined &&
+      typeof search !== 'string'
+    ) {
       return res.status(400).json({
         error: {
           code: 'INVALID_SEARCH',
@@ -405,12 +501,12 @@ app.get('/api/books', async (req, res) => {
       title?: RegExp
     } = {}
 
-    // Find books whose genreIds array includes the selected genre.
+    // Filter books by a particular genre ID.
     if (typeof genreId === 'string') {
       filter.genreIds = new mongoose.Types.ObjectId(genreId)
     }
 
-    // Search titles without treating user input as regex syntax.
+    // Search for titles without case sensitivity.
     if (typeof search === 'string' && search.trim()) {
       const safeSearch = search.trim()
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -418,7 +514,7 @@ app.get('/api/books', async (req, res) => {
       filter.title = new RegExp(safeSearch, 'i')
     }
 
-    // Populate replaces reference IDs with related document details.
+    // Populate retrieves names from related collections.
     const books = await Book.find(filter)
       .populate('authorIds', 'name')
       .populate('genreIds', 'name')
@@ -445,7 +541,7 @@ app.get('/api/books', async (req, res) => {
 })
 
 
-// Get all editions belonging to one book.
+// Retrieve all editions belonging to a particular book.
 app.get('/api/books/:id/editions', async (req, res) => {
   try {
     const { id } = req.params
@@ -472,7 +568,7 @@ app.get('/api/books/:id/editions', async (req, res) => {
       })
     }
 
-    // Editions have references to both Books and Publishers.
+    // Find editions and retrieve their book and publisher details.
     const editions = await Edition.find({
       bookId: id
     })
@@ -500,7 +596,7 @@ app.get('/api/books/:id/editions', async (req, res) => {
 })
 
 
-// Get one book using its MongoDB ObjectId.
+// Retrieve one book by its MongoDB ObjectId.
 app.get('/api/books/:id', async (req, res) => {
   try {
     const { id } = req.params
@@ -545,7 +641,7 @@ app.get('/api/books/:id', async (req, res) => {
 })
 
 
-// Get all genres for the Discover page filter.
+// Retrieve all book genres in alphabetical order.
 app.get('/api/genres', async (req, res) => {
   try {
     const genres = await Genre.find()
@@ -571,7 +667,7 @@ app.get('/api/genres', async (req, res) => {
 })
 
 
-// Connect to MongoDB before accepting API requests.
+// Connect to MongoDB Atlas and start our Express server.
 async function startServer() {
   if (!MONGODB_URI) {
     console.error('MONGODB_URI is missing from the .env file.')
@@ -588,11 +684,13 @@ async function startServer() {
       dbName: DB_NAME
     })
 
+    // Create/check the unique bookshelf index before accepting requests.
+    await Bookshelf.init()
+
     console.log(
       `Connected to MongoDB: ${mongoose.connection.name}`
     )
 
-    // Check whether all 15 Chapterly models were registered.
     const registeredModels = mongoose.modelNames().sort()
 
     console.log(
@@ -607,9 +705,11 @@ async function startServer() {
     })
 
   } catch (error) {
-    console.error('MongoDB connection failed:', error)
+    console.error(
+      'MongoDB connection or server startup failed:',
+      error
+    )
   }
 }
 
 startServer()
-
