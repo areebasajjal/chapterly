@@ -1,0 +1,173 @@
+
+.library-page {
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 36px;
+  color: #294a3d;
+}
+
+.library-header {
+  margin-bottom: 32px;
+}
+
+.library-eyebrow {
+  color: #82a08c;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.library-header h1 {
+  font-family: Georgia, serif;
+  font-size: 36px;
+  margin: 12px 0;
+}
+
+.library-header > p:last-child {
+  color: #758578;
+}
+
+.library-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.library-tab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  background: #fffdfa;
+  border: 1px solid #e5e8df;
+  border-radius: 12px;
+  color: #53675a;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.library-tab.active {
+  background: #294a3d;
+  color: white;
+  border-color: #294a3d;
+}
+
+.library-tab-count {
+  padding: 3px 8px;
+  background: #edf2e9;
+  color: #294a3d;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.library-content {
+  background: #fffdfa;
+  border: 1px solid #e5e8df;
+  border-radius: 20px;
+  padding: 25px;
+}
+
+.library-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.library-section-heading h2 {
+  font-family: Georgia, serif;
+  font-size: 25px;
+  margin: 0;
+}
+
+.library-section-heading span {
+  color: #758578;
+  font-size: 14px;
+}
+
+.library-book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 24px;
+}
+
+.library-book-card {
+  text-decoration: none;
+  color: #294a3d;
+}
+
+.library-book-card img,
+.library-no-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #e8eee6;
+}
+
+.library-no-cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #758578;
+}
+
+.library-book-card h3 {
+  font-size: 15px;
+  margin: 12px 0 5px;
+  line-height: 1.4;
+}
+
+.library-book-card p {
+  font-size: 13px;
+  color: #758578;
+  margin: 0;
+}
+
+.library-empty {
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.library-empty h3 {
+  font-family: Georgia, serif;
+  font-size: 24px;
+}
+
+.library-empty p {
+  color: #758578;
+  margin-bottom: 20px;
+}
+
+.library-empty a {
+  display: inline-block;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #294a3d;
+  color: white;
+  text-decoration: none;
+}
+
+.library-message {
+  padding: 25px;
+}
+
+.library-error {
+  color: #a94442;
+}
+
+@media (max-width: 600px) {
+  .library-page {
+    padding: 24px 16px;
+  }
+
+  .library-header h1 {
+    font-size: 30px;
+  }
+
+  .library-content {
+    padding: 18px;
+  }
+}
