@@ -169,7 +169,7 @@
   padding-top: 20px;
   padding-bottom: 4px;
 
-  border-top: 1px solid rgba(184, 202, 185, 0.25);
+  border-top: 1px solid rgba(122, 255, 129, 0.25);
 
   flex-shrink: 0;
 }
@@ -193,7 +193,7 @@
   border-radius: 50%;
 
   background: #DCE9DE;
-  color: #294A3D;
+  color: #45c491;
 
   font-family: 'Fraunces', Georgia, serif;
   font-size: 19px;
