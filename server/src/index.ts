@@ -17,7 +17,7 @@ import { Bookshelf } from './models/Bookshelvess'
 
 import './models/Authors'
 import './models/Publsihers'
-import './models/ShelfEntries'
+import { ShelfEntry } from './models/ShelfEntries'
 import './models/ReadingSessions'
 import './models/Reviews'
 import './models/Ratings'
@@ -463,6 +463,522 @@ app.get('/api/me/bookshelves', async (req, res) => {
 })
 
 
+app.post('/api/me/bookshelves/:shelfId/books', async (req, res) => {
+  try {
+    const userId = getSessionUserId(req)
+
+    if (!userId) {
+      return res.status(401).json({
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'Please log in first.'
+        }
+      })
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_SESSION',
+          message: 'Your account is not available.'
+        }
+      })
+    }
+
+    const { shelfId } = req.params
+    const { bookId } = req.body ?? {}
+
+    // Both references must be valid MongoDB ObjectIds.
+    if (
+      !mongoose.isObjectIdOrHexString(shelfId) ||
+      typeof bookId !== 'string' ||
+      !mongoose.isObjectIdOrHexString(bookId)
+    ) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid bookshelf or book ID.'
+        }
+      })
+    }
+
+    // A reader can only modify their own bookshelf.
+    const shelf = await Bookshelf.findOne({
+      _id: shelfId,
+      userId: user._id
+    })
+
+    if (!shelf) {
+      return res.status(404).json({
+        error: {
+          code: 'SHELF_NOT_FOUND',
+          message: 'Bookshelf not found.'
+        }
+      })
+    }
+
+    // Check that the selected book exists in our catalog.
+    const bookExists = await Book.exists({
+      _id: bookId
+    })
+
+    if (!bookExists) {
+      return res.status(404).json({
+        error: {
+          code: 'BOOK_NOT_FOUND',
+          message: 'Book not found.'
+        }
+      })
+    }
+
+    // Don't add the same book twice to one bookshelf.
+    const existingEntry = await ShelfEntry.exists({
+      shelfId: shelf._id,
+      bookId
+    })
+
+    if (existingEntry) {
+      return res.status(409).json({
+        error: {
+          code: 'BOOK_ALREADY_SAVED',
+          message: 'This book is already on the selected shelf.'
+        }
+      })
+    }
+
+    // A book can have only one default reading status.
+    if (shelf.isSystem) {
+      const systemShelves = await Bookshelf.find({
+        userId: user._id,
+        isSystem: true,
+        _id: { $ne: shelf._id }
+      }).select('_id')
+
+      const savedElsewhere = await ShelfEntry.exists({
+        bookId,
+        shelfId: {
+          $in: systemShelves.map((item) => item._id)
+        }
+      })
+
+      if (savedElsewhere) {
+        return res.status(409).json({
+          error: {
+            code: 'BOOK_HAS_READING_STATUS',
+            message: 'This book is on another reading-status shelf. Move it instead.'
+          }
+        })
+      }
+    }
+
+    // Store the relationship in the ShelfEntries collection.
+    const entry = await ShelfEntry.create({
+      shelfId: shelf._id,
+      bookId
+    })
+
+    // Retrieve the book's title and cover for our frontend.
+    await entry.populate('bookId', 'title coverUrl publicationYear')
+
+    return res.status(201).json({
+      data: entry,
+      message: 'Book added to your bookshelf.'
+    })
+
+  } catch (error) {
+    if ((error as { code?: number }).code === 11000) {
+      return res.status(409).json({
+        error: {
+          code: 'BOOK_ALREADY_SAVED',
+          message: 'This book is already on the selected shelf.'
+        }
+      })
+    }
+
+    console.error('Error adding book:', error)
+
+    return res.status(500).json({
+      error: {
+        code: 'SAVE_ERROR',
+        message: 'Could not save this book.'
+      }
+    })
+  }
+})
+
+
+app.get('/api/me/bookshelves/:shelfId/books', async (req, res) => {
+  try {
+    // Identify the reader using their login cookie.
+    const userId = getSessionUserId(req)
+
+    if (!userId) {
+      return res.status(401).json({
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'Please log in first.'
+        }
+      })
+    }
+
+    // Confirm the account still exists and is active.
+    const user = await User.findById(userId)
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_SESSION',
+          message: 'Your account is not available.'
+        }
+      })
+    }
+
+    const { shelfId } = req.params
+
+    // Check that the bookshelf ID is valid.
+    if (!mongoose.isObjectIdOrHexString(shelfId)) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid bookshelf ID.'
+        }
+      })
+    }
+
+    // Only allow the reader to access their own bookshelf.
+    const shelf = await Bookshelf.findOne({
+      _id: shelfId,
+      userId: user._id
+    })
+
+    if (!shelf) {
+      return res.status(404).json({
+        error: {
+          code: 'SHELF_NOT_FOUND',
+          message: 'Bookshelf not found.'
+        }
+      })
+    }
+
+    // Find all entries belonging to this bookshelf.
+    const entries = await ShelfEntry.find({
+      shelfId: shelf._id
+    })
+      .populate('bookId', 'title coverUrl publicationYear')
+      .sort({ createdAt: -1 })
+
+    // Send the bookshelf and its saved books to React.
+    return res.json({
+      data: {
+        shelf: {
+          id: shelf._id,
+          name: shelf.name
+        },
+        entries
+      },
+      meta: {
+        total: entries.length
+      }
+    })
+
+  } catch (error) {
+    console.error('Error fetching saved books:', error)
+
+    return res.status(500).json({
+      error: {
+        code: 'FETCH_ERROR',
+        message: 'Could not retrieve saved books.'
+      }
+    })
+  }
+})
+
+
+
+app.delete('/api/me/bookshelves/:shelfId/books/:entryId', async (req, res) => {
+  try {
+    // Identify the reader from their login session.
+    const userId = getSessionUserId(req)
+
+    if (!userId) {
+      return res.status(401).json({
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'Please log in first.'
+        }
+      })
+    }
+
+    // Check that the account exists and is active.
+    const user = await User.findById(userId)
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_SESSION',
+          message: 'Your account is not available.'
+        }
+      })
+    }
+
+    const { shelfId, entryId } = req.params
+
+    // Validate both MongoDB ObjectIds.
+    if (
+      !mongoose.isObjectIdOrHexString(shelfId) ||
+      !mongoose.isObjectIdOrHexString(entryId)
+    ) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid bookshelf or entry ID.'
+        }
+      })
+    }
+
+    // The reader must own the selected bookshelf.
+    const shelf = await Bookshelf.findOne({
+      _id: shelfId,
+      userId: user._id
+    })
+
+    if (!shelf) {
+      return res.status(404).json({
+        error: {
+          code: 'SHELF_NOT_FOUND',
+          message: 'Bookshelf not found.'
+        }
+      })
+    }
+
+    // Delete the entry only if it belongs to this bookshelf.
+    const deletedEntry = await ShelfEntry.findOneAndDelete({
+      _id: entryId,
+      shelfId: shelf._id
+    })
+
+    if (!deletedEntry) {
+      return res.status(404).json({
+        error: {
+          code: 'ENTRY_NOT_FOUND',
+          message: 'Book entry not found on this shelf.'
+        }
+      })
+    }
+
+    return res.json({
+      message: 'Book removed from your bookshelf.',
+      data: {
+        deletedEntryId: deletedEntry._id
+      }
+    })
+
+  } catch (error) {
+    console.error('Error removing book:', error)
+
+    return res.status(500).json({
+      error: {
+        code: 'DELETE_ERROR',
+        message: 'Could not remove this book.'
+      }
+    })
+  }
+})
+
+
+
+app.patch('/api/me/bookshelves/:shelfId/books/:entryId/move', async (req, res) => {
+  try {
+    const userId = getSessionUserId(req)
+
+    if (!userId) {
+      return res.status(401).json({
+        error: {
+          code: 'NOT_AUTHENTICATED',
+          message: 'Please log in first.'
+        }
+      })
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({
+        error: {
+          code: 'INVALID_SESSION',
+          message: 'Your account is not available.'
+        }
+      })
+    }
+
+    const { shelfId, entryId } = req.params
+    const { targetShelfId } = req.body ?? {}
+
+    // Check that all three IDs are valid MongoDB ObjectIds.
+    if (
+      !mongoose.isObjectIdOrHexString(shelfId) ||
+      !mongoose.isObjectIdOrHexString(entryId) ||
+      typeof targetShelfId !== 'string' ||
+      !mongoose.isObjectIdOrHexString(targetShelfId)
+    ) {
+      return res.status(400).json({
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid bookshelf or entry ID.'
+        }
+      })
+    }
+
+    if (shelfId === targetShelfId) {
+      return res.status(400).json({
+        error: {
+          code: 'SAME_SHELF',
+          message: 'The book is already on this bookshelf.'
+        }
+      })
+    }
+
+    // Check that the reader owns both bookshelves.
+    const sourceShelf = await Bookshelf.findOne({
+      _id: shelfId,
+      userId: user._id
+    })
+
+    const targetShelf = await Bookshelf.findOne({
+      _id: targetShelfId,
+      userId: user._id
+    })
+
+    if (!sourceShelf || !targetShelf) {
+      return res.status(404).json({
+        error: {
+          code: 'SHELF_NOT_FOUND',
+          message: 'One of the bookshelves was not found.'
+        }
+      })
+    }
+
+    // Find the book entry on its current shelf.
+    const entry = await ShelfEntry.findOne({
+      _id: entryId,
+      shelfId: sourceShelf._id
+    })
+
+    if (!entry) {
+      return res.status(404).json({
+        error: {
+          code: 'ENTRY_NOT_FOUND',
+          message: 'Book entry not found.'
+        }
+      })
+    }
+
+    // Prevent duplicate copies on the destination shelf.
+    const alreadyOnTarget = await ShelfEntry.exists({
+      shelfId: targetShelf._id,
+      bookId: entry.bookId
+    })
+
+    if (alreadyOnTarget) {
+      return res.status(409).json({
+        error: {
+          code: 'BOOK_ALREADY_SAVED',
+          message: 'This book is already on the destination shelf.'
+        }
+      })
+    }
+
+    // A book should have only one default reading status.
+    if (targetShelf.isSystem) {
+      const otherSystemShelves = await Bookshelf.find({
+        userId: user._id,
+        isSystem: true,
+        _id: {
+          $nin: [sourceShelf._id, targetShelf._id]
+        }
+      }).select('_id')
+
+      const conflictingEntry = await ShelfEntry.exists({
+        bookId: entry.bookId,
+        shelfId: {
+          $in: otherSystemShelves.map((shelf) => shelf._id)
+        }
+      })
+
+      if (conflictingEntry) {
+        return res.status(409).json({
+          error: {
+            code: 'BOOK_HAS_READING_STATUS',
+            message: 'This book already has another reading status.'
+          }
+        })
+      }
+    }
+
+    // Move the existing entry by changing its shelf reference.
+    const updatedEntry = await ShelfEntry.findOneAndUpdate(
+      {
+        _id: entry._id,
+        shelfId: sourceShelf._id
+      },
+      {
+        $set: {
+          shelfId: targetShelf._id
+        }
+      },
+      {
+        new: true,
+        runValidators: true
+      }
+    )
+
+    if (!updatedEntry) {
+      return res.status(409).json({
+        error: {
+          code: 'ENTRY_CHANGED',
+          message: 'This book was moved or removed. Please refresh.'
+        }
+      })
+    }
+
+    await updatedEntry.populate(
+      'bookId',
+      'title coverUrl publicationYear'
+    )
+
+    return res.json({
+      data: {
+        entry: updatedEntry,
+        fromShelf: sourceShelf.name,
+        toShelf: targetShelf.name
+      },
+      message: 'Book moved successfully.'
+    })
+
+  } catch (error) {
+    if ((error as { code?: number }).code === 11000) {
+      return res.status(409).json({
+        error: {
+          code: 'BOOK_ALREADY_SAVED',
+          message: 'This book already exists on the destination shelf.'
+        }
+      })
+    }
+
+    console.error('Error moving book:', error)
+
+    return res.status(500).json({
+      error: {
+        code: 'MOVE_ERROR',
+        message: 'Could not move this book.'
+      }
+    })
+  }
+})
+
+
 // Retrieve all books, with optional genre and title filters.
 app.get('/api/books', async (req, res) => {
   try {
@@ -686,6 +1202,7 @@ async function startServer() {
 
     // Create/check the unique bookshelf index before accepting requests.
     await Bookshelf.init()
+    await ShelfEntry.init()
 
     console.log(
       `Connected to MongoDB: ${mongoose.connection.name}`
